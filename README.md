@@ -5,23 +5,15 @@
 * [x] Flask project setup
 * [x] User accounts
 * [x] Login, signup, index, 404 and 500 pages
-* [ ] Figure out feed format
+* [x] Figure out feed format
+* [x] Simple "create feed" (title, link, desc)
+* [x] Simple feed generation function
+* [ ] Advanced "create feed" with preview
 
 ## Project Timeline
-Create a timeline with milestones and deadlines.
-
-* **Start:** 2023-10-21 10:21
-* Hello World: 10:21 - 10:42
-* User Accounts: 10:42 - 11:45
-* **End:** TBD
-
-## Data Collection
-Explain how you are collecting data from the website.
-
-## Data Parsing
-Describe the process of parsing the collected data.
-
-## RSS Feed Generation
-Explain how the RSS feeds are generated from the parsed data.
-
-## Documentation
+**2023-10-21**
+1021 - 1042 Hello World
+1042 - 1145 User Accounts
+1145 - 1201 Figure Our Project Structure
+1202 - 1230 Simple "Add Feed"
+1233 - 1256 Simple Feed Generation

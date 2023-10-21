@@ -1,4 +1,13 @@
 {% extends "base.html" %} {% block content %}
 <h2>Hello {{ current_user.username }}!</h2>
+<ul>
+	{% for feed in feeds %}
+	<li>
+		<a href="{{ url_for('get_feed', id=feed.id) }}">[link]</a> ~ <b>{{ feed.title }}</b> ~ <a>{{ feed.link }}</a><br>
+        <p>description: {{ feed.desc }}</p>
+	</li>
+	<br>
+	{% endfor %}
+</ul>
 <p>Index page content coming soon :D</p>
 {% endblock %}

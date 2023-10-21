@@ -1,15 +1,15 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, Response
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db
-from app.models import User
-from app.forms import LoginForm, RegistrationForm
+from app.models import User, Feed
+from app.forms import LoginForm, RegistrationForm, CreateFeedForm
 from werkzeug.urls import url_parse
 
 @app.route('/')
 @app.route('/index')
 @login_required
 def index():
-    return render_template('index.html', title='Home')
+    return render_template('index.html', title='Home', feeds=Feed.query.filter_by(owner=current_user))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -51,3 +51,23 @@ def register():
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+@app.route('/create-feed', methods=['GET', 'POST'])
+@login_required
+def create_feed():
+    form = CreateFeedForm()
+    if form.validate_on_submit():
+        desc = form.desc.data
+        if desc == "":
+            desc = "an RSS feed of " + str(form.link.data)
+        feed = Feed(owner=current_user, title=form.title.data, link=form.link.data, desc=desc)
+        db.session.add(feed)
+        db.session.commit()
+        flash('RSS feed created')
+        return redirect(url_for('index'))
+    return render_template('create-feed.html', title='Create Feed', form=form)
+
+@app.route('/feed/<id>.xml')
+def get_feed(id):
+    feed = Feed.query.filter_by(id=id).first_or_404()
+    return Response(feed.gen_xml(), mimetype='text/xml')

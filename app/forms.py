@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField
 from wtforms.validators import ValidationError, DataRequired, EqualTo
 from app.models import User
 
@@ -26,3 +26,9 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Please use at least 8 characters in your password')
         if password.data == 'password':
             raise ValidationError('Seriously? (¬_¬) use something other than \"password\"')
+
+class CreateFeedForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()], render_kw={"placeholder": "Cool Site"})
+    link = StringField('Link', validators=[DataRequired()], render_kw={"placeholder": "http://example.com"})
+    desc = TextAreaField('Description', render_kw={"placeholder": "an RSS feed from a very cool website"})
+    submit = SubmitField('Add')

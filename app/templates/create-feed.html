@@ -1,0 +1,29 @@
+{% extends "base.html" %} {% block content %}
+<h2>Create a new feed</h2>
+<form action="" method="post">
+	{{ form.hidden_tag() }}
+	<p>
+		{{ form.title.label }}<br />
+		{{ form.title(size=16) }}<br />
+		{% for error in form.title.errors %}
+		<span style="color: red">[{{ error }}]</span>
+		{% endfor %}
+	</p>
+	<p>
+		{{ form.link.label }}<br />
+		{{ form.link(size=32) }}<br />
+		{% for error in form.link.errors %}
+		<span style="color: red">[{{ error }}]</span>
+		{% endfor %}
+	</p>
+	<p>
+		{{ form.desc.label }}<br />
+		{{ form.desc(size=32) }}<br />
+		{% for error in form.desc.errors %}
+		<span style="color: red">[{{ error }}]</span>
+		{% endfor %}
+	</p>
+	<p>{{ form.submit() }}</p>
+</form>
+
+{% endblock %}
