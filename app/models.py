@@ -22,6 +22,7 @@ class User(UserMixin, db.Model):
 class Feed(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    item_search_pattern = db.Column(db.Text)
     title = db.Column(db.Text)
     link = db.Column(db.Text)
     desc = db.Column(db.Text)
