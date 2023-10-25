@@ -23,9 +23,13 @@ class Feed(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     item_search_pattern = db.Column(db.Text)
+    address = db.Column(db.Text)
     title = db.Column(db.Text)
     link = db.Column(db.Text)
     desc = db.Column(db.Text)
+    item_title_template = db.Column(db.Text)
+    item_link_template = db.Column(db.Text)
+    item_content_template = db.Column(db.Text)
 
     def gen_xml(self):
         root = ET.Element("rss", version="2.0")

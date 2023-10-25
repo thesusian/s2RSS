@@ -10,14 +10,15 @@
 -   [x] Figure out feed format
 -   [x] Simple "create feed" (title, link, desc)
 -   [x] Simple feed generation function
--   [ ] PoC Search Patterns
+-   [x] PoC Search Patterns
 -   [ ] Advanced "create feed"
 -   [ ] Preview in "create feed"
+-   [ ] Document `fetch-address` and `fetch-pattern-result`
+-   [ ] Basic Error Handlin
 
 ## Project Timeline
 
 **2023-10-21**
-
 -   `1021 - 1042` Hello World
 -   `1042 - 1145` User Accounts
 -   `1145 - 1201` Figure Our Project Structure
@@ -25,10 +26,15 @@
 -   `1233 - 1256` Simple Feed Generation
 -   `1351 - 1422` Write Usage Documentation
 -   `0749 - 0901` Write PoC Search Patterns (too much regex)
+-   `0901 - 0923` Bug Fixes in the PoC
+
+**2023-10-23**
+-   `1007` - `1123` Basic Web Implementation
 
 ## Known Problems
 
-Application is currently vunerable to regex DoS attacks
+-   Application is currently vulnerable to regex DoS attacks
+-   Only works on static websites
 
 ## Usage
 

@@ -1,29 +1,58 @@
 {% extends "base.html" %} {% block content %}
 <h2>Create a new feed</h2>
-<form action="" method="post">
-	{{ form.hidden_tag() }}
-	<p>
-		{{ form.title.label }}<br />
-		{{ form.title(size=16) }}<br />
-		{% for error in form.title.errors %}
-		<span style="color: red">[{{ error }}]</span>
-		{% endfor %}
-	</p>
-	<p>
-		{{ form.link.label }}<br />
-		{{ form.link(size=32) }}<br />
-		{% for error in form.link.errors %}
-		<span style="color: red">[{{ error }}]</span>
-		{% endfor %}
-	</p>
-	<p>
-		{{ form.desc.label }}<br />
-		{{ form.desc(size=32) }}<br />
-		{% for error in form.desc.errors %}
-		<span style="color: red">[{{ error }}]</span>
-		{% endfor %}
-	</p>
-	<p>{{ form.submit() }}</p>
-</form>
+<h3>Get the target address</h3>
 
+<span>Address</span>
+<input type="text" id="address_input" placeholder="https://example.com">
+<button onclick="fetchAddress()">Send Data</button>
+<pre id="source_code"></pre>
+
+<hr>
+
+<span>Address</span>
+<input type="text" id="pattern_input" placeholder="ADD LATER">
+<button onclick="fetchPatternResult()">Send Data</button>
+<pre id="pattern_result"></pre>
+
+<script>
+	function fetchAddress() {
+		var address = document.getElementById("address_input").value;
+		if (address) {
+			// Send the website URL to the server using an AJAX request
+			fetch('/fetch-source', {
+				method: 'POST',
+				body: JSON.stringify({ address: address }),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+				.then(response => response.json())
+				.then(data => {
+					var sourceCodeElement = document.getElementById("source_code");
+					sourceCodeElement.textContent = data.source_code;
+				});
+		}
+	}
+	function fetchPatternResult() {
+		var pattern = document.getElementById("pattern_input").value;
+		var source_code = document.getElementById("source_code").textContent;
+		if (pattern && source_code) {
+			// Send the website URL to the server using an AJAX request
+			fetch('/fetch-pattern-result', {
+				method: 'POST',
+				body: JSON.stringify({ pattern: pattern, source_code: source_code}),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+				.then(response => response.json())
+				.then(data => {
+					var patternResult = document.getElementById("pattern_result");
+					patternResult.textContent = data.pattern_result;
+				});
+		} else {
+			console.error("source code or pattern not provided");
+		}
+	}
+</script>
 {% endblock %}

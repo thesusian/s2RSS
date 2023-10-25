@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField
-from wtforms.validators import ValidationError, DataRequired, EqualTo
+from wtforms.validators import ValidationError, DataRequired, EqualTo, URL
 from app.models import User
 
 class LoginForm(FlaskForm):
@@ -29,6 +29,19 @@ class RegistrationForm(FlaskForm):
 
 class CreateFeedForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()], render_kw={"placeholder": "Cool Site"})
-    link = StringField('Link', validators=[DataRequired()], render_kw={"placeholder": "http://example.com"})
+    link = StringField('Feed Link', validators=[DataRequired(), URL()], render_kw={"placeholder": "http://example.com"})
     desc = TextAreaField('Description', render_kw={"placeholder": "an RSS feed from a very cool website"})
+    item_title_template = StringField('Item Title Template', validators=[DataRequired()], render_kw={"placeholder": "{%1}"})
+    item_link_template = StringField('Item Link Template', validators=[DataRequired()], render_kw={"placeholder": "{%2}"})
+    item_content_template = StringField('Item Content Template', validators=[DataRequired()], render_kw={"placeholder": "{%3}"})
+        
     submit = SubmitField('Add')
+
+class LoadSourceForm(FlaskForm):
+    address = StringField('Address', validators=[DataRequired(), URL()], render_kw={"placeholder": "http://example.com/posts"})
+    submit_source = SubmitField('Load')
+
+class SearchPatternForm(FlaskForm):
+    pattern = TextAreaField('Item Search Pattern', validators=[DataRequired()], render_kw={"placeholder": "<div id=\"{*}\" class=\"post\">{%}</div>"})
+    submit_pattern = SubmitField('Extract')
+

@@ -1,8 +1,10 @@
-from flask import render_template, flash, redirect, url_for, request, Response
+from flask import render_template, flash, redirect, url_for, request, Response, jsonify
 from flask_login import current_user, login_user, logout_user, login_required
+import requests
+from app.searcher import get_foramtted_list
 from app import app, db
 from app.models import User, Feed
-from app.forms import LoginForm, RegistrationForm, CreateFeedForm
+from app.forms import LoginForm, RegistrationForm, LoadSourceForm, SearchPatternForm
 from werkzeug.urls import url_parse
 
 @app.route('/')
@@ -55,17 +57,28 @@ def register():
 @app.route('/create-feed', methods=['GET', 'POST'])
 @login_required
 def create_feed():
-    form = CreateFeedForm()
-    if form.validate_on_submit():
-        desc = form.desc.data
-        if desc == "":
-            desc = "an RSS feed of " + str(form.link.data)
-        feed = Feed(owner=current_user, title=form.title.data, link=form.link.data, desc=desc)
-        db.session.add(feed)
-        db.session.commit()
-        flash('RSS feed created')
-        return redirect(url_for('index'))
-    return render_template('create-feed.html', title='Create Feed', form=form)
+    feed = Feed()
+    return render_template('create-feed.html', title='Create Feed')
+
+@app.route('/fetch-source', methods=['POST'])
+@login_required
+def fetch_source():
+    address = request.json['address']
+    try:
+        response = requests.get(address)
+        source_code = response.text
+    except Exception as e:
+        source_code = f"Error: {str(e)}"
+        # FIX , users shouldn't be seeing error messages        
+    return jsonify({'source_code': source_code})
+
+@app.route('/fetch-pattern-result', methods=['POST'])
+@login_required
+def search_pattern_form():
+    pattern = request.json['pattern']
+    source_code = request.json['source_code']
+    pattern_result = get_foramtted_list(source_code, pattern)
+    return jsonify({'pattern_result': pattern_result})
 
 @app.route('/feed/<id>.xml')
 def get_feed(id):
