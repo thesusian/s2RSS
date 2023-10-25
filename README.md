@@ -11,14 +11,17 @@
 -   [x] Simple "create feed" (title, link, desc)
 -   [x] Simple feed generation function
 -   [x] PoC Search Patterns
--   [ ] Advanced "create feed"
--   [ ] Preview in "create feed"
--   [ ] Document `fetch-address` and `fetch-pattern-result`
--   [ ] Basic Error Handlin
+-   [x] Advanced "create feed"
+-   [x] Preview in "create feed"
+-   [x] Document `fetch-address`, `fetch-pattern-result` etc...
+-   [ ] Basic Error Handling
+-   [ ] Errors to the log file
+-   [ ] Optimize the API calls from create-feed, do we really need to send the source 3 times?
 
 ## Project Timeline
 
 **2023-10-21**
+
 -   `1021 - 1042` Hello World
 -   `1042 - 1145` User Accounts
 -   `1145 - 1201` Figure Our Project Structure
@@ -29,12 +32,20 @@
 -   `0901 - 0923` Bug Fixes in the PoC
 
 **2023-10-23**
--   `1007` - `1123` Basic Web Implementation
+
+-   `1007 - 1123` Basic Web Implementation
+
+**2023-10-25**
+
+-   `1740 - 1903` Create Feed Page All Done
+-   `1912 - 2030` Working MPV Done
+-   `2035 - 2144` Documentation
 
 ## Known Problems
 
 -   Application is currently vulnerable to regex DoS attacks
 -   Only works on static websites
+-   Does not work with a single item element match, must be 2 or more
 
 ## Usage
 
