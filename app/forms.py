@@ -69,4 +69,4 @@ class CreateFeedForm(FlaskForm):
         validators=[DataRequired()],
         render_kw={"placeholder": "{%3}"},
     )
-    submit = SubmitField("Add!!")
+    submit = SubmitField("Submit")

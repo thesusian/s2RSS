@@ -14,9 +14,18 @@
 -   [x] Advanced "create feed"
 -   [x] Preview in "create feed"
 -   [x] Document `fetch-address`, `fetch-pattern-result` etc...
--   [ ] Basic Error Handling
--   [ ] Errors to the log file
+-   [x] Errors to the log file
 -   [ ] Optimize the API calls from create-feed, do we really need to send the source 3 times?
+
+### 0.2 - Scaling
+
+-   [ ] Implement queueing for the `fetch-address`
+-   [ ] Handle regex matches that takes too long
+-   [ ] Change to Atom feeds
+
+### 0.3 - UI/UX
+
+-   [ ] Format the code after `fetch-address` to make it more readable
 
 ## Project Timeline
 
@@ -41,13 +50,25 @@
 -   `1912 - 2030` Working MPV Done
 -   `2035 - 2144` Documentation
 
+**2023-10-26**
+
+-   `2230 - 2320` Final Touches
+
+**2023-10-27**
+
+-   `1400 - 1543` Final Touches and Bug Fixes
+-   `1604 - 1650` Edit and Delete Feeds
+
 ## Known Problems
 
--   Application is currently vulnerable to regex DoS attacks
+-   ~~Application is currently vulnerable to regex DoS attacks~~ (still needs more testing)
 -   Only works on static websites
--   Does not work with a single item element match, must be 2 or more
+-   ~~Does not work with a single item element match, must be 2 or more~~
+-   CSRF is possible for deleteing feeds if the attacker knows the feed id
 
 ## Usage
+
+Default credentials: `admin:12345678`
 
 Each item in your RSS feed will have 3 main properties, author, title, link and content.
 To extract this data from the website we will use search patterns, for example let's
@@ -56,13 +77,13 @@ of random HN post
 
 ```html
 ...
-<tr class="athing" id="37965142">
+<tr class="athing" id="38035672">
 	<td align="right" valign="top" class="title">
 		<span class="rank">1.</span>
 	</td>
 	<td valign="top" class="votelinks">
 		<center>
-			<a id="up_37965142" href="vote?id=37965142&amp;how=up&amp;goto=news"
+			<a id="up_38035672" href="vote?id=38035672&amp;how=up&amp;goto=news"
 				><div class="votearrow" title="upvote"></div
 			></a>
 		</center>
@@ -70,13 +91,13 @@ of random HN post
 	<td class="title">
 		<span class="titleline"
 			><a
-				href="https://unixsheikh.com/articles/we-have-used-too-many-levels-of-abstractions-and-now-the-future-looks-bleak.html"
+				href="https://mathstodon.xyz/@tao/111287749336059662"
 				rel="noreferrer"
-				>We have used too many levels of abstractions and now the future
-				looks bleak</a
+				>Lean4 helped Terence Tao discover a small bug in his recent
+				paper</a
 			><span class="sitebit comhead">
-				(<a href="from?site=unixsheikh.com"
-					><span class="sitestr">unixsheikh.com</span></a
+				(<a href="from?site=mathstodon.xyz"
+					><span class="sitestr">mathstodon.xyz</span></a
 				>)</span
 			></span
 		>
@@ -86,17 +107,18 @@ of random HN post
 	<td colspan="2"></td>
 	<td class="subtext">
 		<span class="subline">
-			<span class="score" id="score_37965142">218 points</span> by
-			<a href="user?id=riidom" class="hnuser">riidom</a>
-			<span class="age" title="2023-10-21T08:42:52"
-				><a href="item?id=37965142">2 hours ago</a></span
+			<span class="score" id="score_38035672">155 points</span> by
+			<a href="user?id=gridentio" class="hnuser">gridentio</a>
+			<span class="age" title="2023-10-27T07:25:32"
+				><a href="item?id=38035672">4 hours ago</a></span
 			>
-			<span id="unv_37965142"></span> |
-			<a href="hide?id=37965142&amp;goto=news">hide</a> |
-			<a href="item?id=37965142">118&nbsp;comments</a>
+			<span id="unv_38035672"></span> |
+			<a href="hide?id=38035672&amp;goto=news">hide</a> |
+			<a href="item?id=38035672">52&nbsp;comments</a>
 		</span>
 	</td>
 </tr>
+<tr class="spacer" style="height:5px"></tr>
 ...
 ```
 
@@ -108,19 +130,17 @@ do need the post ID, you will see why later
 
 ```html
 {*}
-<tr class="athing" id="37965142">
+<tr class="athing" id="38035672">
 	{*}
 	<td class="title">
 		<span class="titleline">
 			<a
-				href="https://unixsheikh.com/articles/we-have-used-too-many-levels-of-abstractions-and-now-the-future-looks-bleak.html"
+				href="https://mathstodon.xyz/@tao/111287749336059662"
 				rel="noreferrer"
-				>We have used too many levels of abstractions and now the future
-				looks bleak</a>
+				>Lean4 helped Terence Tao discover a small bug in his recent paper</a>
 			{*}
 	<span class="score" id="{*}"></span> by
-		<a {*}>riidom</a>
-		<span {*}></span>
+		<a href="user?id=gridentio" class="hnuser">gridentio</a>
 	</td>
 </tr>
 {*}
@@ -131,26 +151,29 @@ to find the items we care about, then we can construct out final item title, lin
 content
 
 ```html
-{*}<tr class="athing" id="{%}">{*}<td class="title"> <span class="titleline"> <a href="{%}" rel="noreferrer">{%}</a>{*} by {*}class="hnuser">{%}</a>
+<tr class="athing" id="{%}">
+	{*}<span class="titleline"
+		><a href="{%}" {*}>{%}</a>{*}<a href="user?id={%}" class="hnuser"></a
+	></span>
+</tr>
 ```
 
 As you can see, we used search patterns for 3 values, the post id, the link and the title
 our values must look like this
 
 ```bash
-{%1} = 37965142
-{%2} = https://unixsheikh.com/articles/we-have-used-too-many-levels-of-abstractions-and-now-the-future-looks-bleak.html
-{%3} = We have used too many levels of abstractions and now the future looks bleak
-{%4} = riidom
+{%1}: 38035672
+{%2}: https://mathstodon.xyz/@tao/111287749336059662
+{%3}: Lean4 helped Terence Tao discover a small bug in his recent paper
+{%4}: gridentio
 ```
 
 Now you can see how we will construct our item properties, we can do something like this
 
 ```bash
-author = {%4}
-title = {%3}
+title = {%3} by ~{%4}
 link = https://news.ycombinator.com/item?id={%1}
-content = https://unixsheikh.com/articles/we-have-used-too-many-levels-of-abstractions-and-now-the-future-looks-bleak.html
+content = {%2}
 ```
 
 It's that simple, you use the search pattern to find information, and then you use

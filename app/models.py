@@ -50,19 +50,19 @@ class Feed(db.Model):
 
         # Add the items to the feed!
         for item in items:
-            item_title, item_link, item_desc = "", "", ""
             item_element = ET.SubElement(channel, "item")
+            title, link, content = self.item_title_template, self.item_link_template, self.item_content_template
             for info in items[item]:
                 # First check if item template has an element in it
-                if info in self.item_title_template:
-                    item_title = self.item_title_template.replace(info, items[item][info])
-                if info in self.item_link_template:
-                    item_link = self.item_link_template.replace(info, items[item][info])
-                if info in self.item_content_template:
-                    item_desc = self.item_content_template.replace(info, items[item][info])
-            ET.SubElement(item_element, "title").text = item_title
-            ET.SubElement(item_element, "link").text = item_link
-            ET.SubElement(item_element, "description").text = item_desc
+                if info in title:
+                    title = title.replace(info, items[item][info])
+                if info in link:
+                    link = link.replace(info, items[item][info])
+                if info in content:
+                    content = content.replace(info, items[item][info])
+            ET.SubElement(item_element, "title").text = title
+            ET.SubElement(item_element, "link").text = link
+            ET.SubElement(item_element, "description").text = content
 
         return ET.tostring(root, encoding="utf-8").decode()
 

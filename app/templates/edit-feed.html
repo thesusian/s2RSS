@@ -1,0 +1,202 @@
+{% extends "base.html" %} {% block content %}
+<h2>Edit feed</h2>
+
+<form action="" method="post" novalidate>
+	{{ form.hidden_tag() }}
+
+	<h3>Get the target address</h3>
+	<p>
+		{{ form.address.label }}<br />
+		{{ form.address(size=32) }}<br />
+		{% for error in form.address.errors %}
+		<span style="color: red">[{{ error }}]</span>
+		{% endfor %}
+	</p>	
+	<button type="button" onclick="fetchAddress(function(){})">Get Source</button>
+	<pre id="source_code"></pre>
+
+	<hr />
+
+	<h3>Write the items pattern</h3>
+	<p>
+		{{ form.pattern.label }}<br />
+		{{ form.pattern(size=32) }}<br />
+		{% for error in form.pattern.errors %}
+		<span style="color: red">[{{ error }}]</span>
+		{% endfor %}
+	</p>
+	<button type="button" onclick="fetchPatternResult(function(){})">Check</button>
+	<pre id="pattern_result"></pre>
+
+	<hr />
+
+	<h3>How do you want your feed to look</h3>
+	<p>Use the results from above to construct your feed</p>
+	<p>
+		{{ form.item_title_template.label }}<br />
+		{{ form.item_title_template(size=32) }}<br />
+		{% for error in form.item_title_template.errors %}
+		<span style="color: red">[{{ error }}]</span>
+		{% endfor %}
+	</p>	
+	<p>
+		{{ form.item_link_template.label }}<br />
+		{{ form.item_link_template(size=32) }}<br />
+		{% for error in form.item_link_template.errors %}
+		<span style="color: red">[{{ error }}]</span>
+		{% endfor %}
+	</p>	
+	<p>
+		{{ form.item_content_template.label }}<br />
+		{{ form.item_content_template(size=32) }}<br />
+		{% for error in form.item_content_template.errors %}
+		<span style="color: red">[{{ error }}]</span>
+		{% endfor %}
+	</p>
+	<button type="button" onclick="fetchTemplateResult(function(){})">Check</button>
+	<pre id="template_result"></pre>
+
+	<hr />
+
+	<h3>Finally, write the info about your feed to save it!</h3>
+
+	<p>
+		{{ form.title.label }}<br />
+		{{ form.title(size=32) }}<br />
+		{% for error in form.title.errors %}
+		<span style="color: red">[{{ error }}]</span>
+		{% endfor %}
+	</p>
+	<p>
+		{{ form.link.label }}<br />
+		{{ form.link(size=32) }}<br />
+		{% for error in form.link.errors %}
+		<span style="color: red">[{{ error }}]</span>
+		{% endfor %}
+	</p>
+	<p>
+		{{ form.desc.label }}<br />
+		{{ form.desc(size=32) }}<br />
+		{% for error in form.desc.errors %}
+		<span style="color: red">[{{ error }}]</span>
+		{% endfor %}
+	</p>
+
+	<p>{{ form.submit() }}</p>
+
+</form>
+<script>
+	// input id in FlaskWTF matches the form element name
+	function fetchAddress(callback) {
+		var address = document.getElementById("address").value;
+		if (address) {
+			// Send the website URL to the server using an AJAX request
+			fetch("/fetch-source", {
+				method: "POST",
+				body: JSON.stringify({ address: address }),
+				headers: {
+					"Content-Type": "application/json",
+				},
+			})
+				.then((response) => response.json())
+				.then((data) => {
+					var sourceCodeElement =
+						document.getElementById("source_code");
+					sourceCodeElement.textContent = data.source_code;
+					callback();
+				});
+		}
+	}
+	function fetchPatternResult(callback) {
+		var pattern = document.getElementById("pattern").value;
+		var source_code = document.getElementById("source_code").textContent;
+		if (pattern && source_code) {
+			// Send the website URL to the server using an AJAX request
+			fetch("/fetch-pattern-result", {
+				method: "POST",
+				body: JSON.stringify({
+					pattern: pattern,
+					source_code: source_code,
+				}),
+				headers: {
+					"Content-Type": "application/json",
+				},
+			})
+				.then((response) => response.json())
+				.then((data) => {
+					var patternResult =
+						document.getElementById("pattern_result");
+					patternResult.textContent = data.pattern_result;
+					callback();
+				});
+		} else {
+			console.error("source code or pattern not provided");
+		}
+	}
+	function fetchTemplateResult(callback) {
+		var pattern = document.getElementById("pattern").value;
+		var source_code = document.getElementById("source_code").textContent;
+		var title_item_template = 
+			document.getElementById("item_title_template").value;
+		var link_item_template =
+			document.getElementById("item_link_template").value;
+		var desc_item_template =
+			document.getElementById("item_content_template").value;
+		if (
+			title_item_template &&
+			link_item_template &&
+			desc_item_template &&
+			pattern &&
+			source_code
+		) {
+			// Send the website URL to the server using an AJAX request
+			fetch("/fetch-template-result", {
+				method: "POST",
+				body: JSON.stringify({
+					pattern: pattern,
+					source_code: source_code,
+					title_item_template: title_item_template,
+					link_item_template: link_item_template,
+					desc_item_template: desc_item_template
+				}),
+				headers: {
+					"Content-Type": "application/json",
+				},
+			})
+				.then((response) => response.json())
+				.then((data) => {
+					var templateResult =
+						document.getElementById("template_result");
+					templateResult.textContent = data.template_result;
+					callback();
+				});
+		} else {
+			console.error(
+				"source code, pattern or one of the item templates not provided"
+			);
+		}
+	}
+
+	async function fetchAll() {
+	try {
+		await fetchAddress();
+		await new Promise(r => setTimeout(r, 100));
+		await fetchPatternResult();
+		await new Promise(r => setTimeout(r, 100));
+		await fetchTemplateResult();
+		// All functions have completed successfully in order.
+	} catch (error) {
+		console.error("Error in fetchAll(): " + error)
+	}
+	}
+
+	// Call the function to start the sequence when the page loads
+	window.addEventListener('load', () => {
+		fetchAddress(function () {
+			fetchPatternResult(function () {
+				fetchTemplateResult(function () {});
+			});
+		});
+	});
+</script>
+{% endblock %}
